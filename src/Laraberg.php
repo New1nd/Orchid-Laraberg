@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ProTrafficGroup\OrchidLaraberg\Laraberg;
+namespace ProTrafficGroup\OrchidLaraberg;
 
 use Orchid\Screen\Field;
 
@@ -15,7 +15,7 @@ class Laraberg extends Field
         'options' => [],
     ];
 
-    public static function make(?string $name = null): CKEditor
+    public static function make(?string $name = null): Laraberg
     {
         return (new static())
             ->name($name)
