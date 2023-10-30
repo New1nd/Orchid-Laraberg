@@ -1,5 +1,6 @@
 {
     "name": "protrafficgroup/orchid-laraberg",
+    "type": "library",
     "require": {
         "van-ons/laraberg": "^2.0",
         "orchid/platform": "^14.15"
