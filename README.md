@@ -194,10 +194,3 @@ Laraberg uses the WordPress Gutenberg packages under the hood, a lot of those pa
 - `Laraberg.wordpress.hooks`
 - `Laraberg.wordpress.serverSideRender`
 
-<div align="center">
-	<br><br><br>
-	<a href="https://van-ons.nl">
-	    <img src="https://van-ons.nl/assets/mail/logo-vo-groen-2019-mail.png"/>
-	</a>
-  <br>
-</div>
