@@ -20,10 +20,6 @@ class LarabergServiceProvider extends ServiceProvider
         });
 
         $this->offerPublishing();
-
-        Artisan::call('vendor:publish', [
-            '--provider' => 'VanOns\\Laraberg\\LarabergServiceProvider'
-        ]);
     }
 
     public function register()
