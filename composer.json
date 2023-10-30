@@ -11,6 +11,9 @@
             "ProTrafficGroup\\OrchidLaraberg\\": "src/"
         }
     },
+    "post-package-install": [
+        "php artisan vendor:publish --provider=\"VanOns\\Laraberg\\LarabergServiceProvider\""
+    ],
     "extra": {
         "laravel": {
             "providers": [
