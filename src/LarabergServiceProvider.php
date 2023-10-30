@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProTrafficGroup\OrchidLaraberg;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Orchid\Support\Facades\Dashboard;
@@ -19,6 +20,10 @@ class LarabergServiceProvider extends ServiceProvider
         });
 
         $this->offerPublishing();
+
+        Artisan::call('vendor:publish', [
+            '--provider' => 'VanOns\\Laraberg\\LarabergServiceProvider'
+        ]);
     }
 
     public function register()
@@ -41,5 +46,6 @@ class LarabergServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('orchid-laraberg.php'),
         ], 'laraberg-config');
+
     }
 }

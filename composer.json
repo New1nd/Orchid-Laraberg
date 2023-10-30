@@ -1,19 +1,20 @@
 {
     "name": "protrafficgroup/orchid-laraberg",
     "type": "library",
+    "license": "MIT",
     "require": {
         "van-ons/laraberg": "^2.0",
         "orchid/platform": "^14.15"
     },
     "autoload": {
         "psr-4": {
-            "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\": "src/"
+            "ProTrafficGroup\\OrchidLaraberg\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\LarabergServiceProvider"
+                "ProTrafficGroup\\OrchidLaraberg\\LarabergServiceProvider"
             ]
         }
     },
