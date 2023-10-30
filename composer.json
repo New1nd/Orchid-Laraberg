@@ -1,0 +1,17 @@
+{
+    "name": "protrafficgroup/orchid-laraberg",
+    "require": {
+        "van-ons/laraberg": "^2.0",
+        "orchid/platform": "^14.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "Protrafficgroup\\OrchidLaraberg\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Newind"
+        }
+    ]
+}
