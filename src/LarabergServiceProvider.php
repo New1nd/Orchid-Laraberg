@@ -46,5 +46,6 @@ class LarabergServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('orchid-laraberg.php'),
         ], 'laraberg-config');
+
     }
 }
