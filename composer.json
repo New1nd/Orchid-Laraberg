@@ -9,6 +9,13 @@
             "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\LarabergServiceProvider"
+            ]
+        }
+    },
     "authors": [
         {
             "name": "Newind"
