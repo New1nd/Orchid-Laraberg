@@ -1,9 +1,6 @@
 # Laraberg Orchid Laravel #
 ## Gutenberg editor for laravel orchid panel ##
 
-[![Latest Version](https://img.shields.io/packagist/v/van-ons/laraberg)](https://packagist.org/packages/van-ons/laraberg)
-![License](https://img.shields.io/github/license/VanOns/laraberg.svg)
-
 Laraberg aims to provide an easy way to integrate the Gutenberg editor with your Laravel projects. It takes the Gutenberg editor and adds all the communication and data it needs function in a Laravel environment.
 
 # Table of Contents <!-- omit in toc -->
