@@ -13,7 +13,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\LarabergServiceProvider"
+                "ProTrafficGroup\\OrchidLaraberg\\LarabergServiceProvider"
             ]
         }
     },
