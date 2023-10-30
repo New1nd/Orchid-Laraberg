@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProTrafficGroup\OrchidLaraberg\Laraberg;
+namespace ProTrafficGroup\OrchidLaraberg;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\View\Factory as ViewFactory;

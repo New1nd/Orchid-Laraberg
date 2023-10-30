@@ -7,13 +7,13 @@
     },
     "autoload": {
         "psr-4": {
-            "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\": "src/"
+            "ProTrafficGroup\\OrchidLaraberg\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ProTrafficGroup\\OrchidLaraberg\\Laraberg\\LarabergServiceProvider"
+                "ProTrafficGroup\\OrchidLaraber\\LarabergServiceProvider"
             ]
         }
     },

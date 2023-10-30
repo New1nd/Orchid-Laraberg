@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ProTrafficGroup\OrchidLaraber\Laraberg;
+namespace ProTrafficGroup\OrchidLaraber;
 
 use Orchid\Screen\Field;
 
