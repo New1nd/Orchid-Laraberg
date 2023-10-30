@@ -20,6 +20,10 @@ class LarabergServiceProvider extends ServiceProvider
         });
 
         $this->offerPublishing();
+
+        Artisan::call('vendor:publish', [
+            '--provider' => 'VanOns\\Laraberg\\LarabergServiceProvider'
+        ]);
     }
 
     public function register()
@@ -42,9 +46,5 @@ class LarabergServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('orchid-laraberg.php'),
         ], 'laraberg-config');
-
-        Artisan::call('vendor:publish', [
-            '--provider' => 'VanOns\\Laraberg\\LarabergServiceProvider'
-        ]);
     }
 }
