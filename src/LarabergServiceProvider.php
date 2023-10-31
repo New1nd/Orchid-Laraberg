@@ -37,7 +37,7 @@ class LarabergServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../public' => public_path('vendor/protrafficgroup/orchid-laraberg'),
-        ], ['laraberg-assets', 'laravel-assets', 'orchid-assets']);
+        ], ['laraberg-assets', 'laravel-assets', 'orchid-assets', 'public']);
 
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('orchid-laraberg.php'),
