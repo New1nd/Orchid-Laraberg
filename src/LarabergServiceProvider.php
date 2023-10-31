@@ -44,4 +44,13 @@ class LarabergServiceProvider extends ServiceProvider
         ], 'laraberg-config');
 
     }
+
+    public static function handlePostAutoloadDump()
+    {
+        Artisan::call('vendor:publish', [
+            '--tag' => 'public',
+            '--ansi' => true,
+            '--force' => true,
+        ]);
+    }
 }

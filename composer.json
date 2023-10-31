@@ -21,8 +21,7 @@
             "@php artisan vendor:publish --tag=public --ansi --force"
         ],
         "post-autoload-dump": [
-            "@php artisan vendor:publish --provider=\"VanOns\\Laraberg\\LarabergServiceProvider\"",
-            "@php artisan vendor:publish --tag=public --ansi --force"
+            "ProTrafficGroup\\OrchidLaraberg\\LarabergServiceProvider::handlePostAutoloadDump"
         ]
     },
     "extra": {
