@@ -1,187 +1,190 @@
-# Laraberg Orchid Laravel #
-## Gutenberg editor for laravel orchid panel ##
+# Orchid Laraberg
 
-Laraberg aims to provide an easy way to integrate the Gutenberg editor with your Laravel projects. It takes the Gutenberg editor and adds all the communication and data it needs function in a Laravel environment.
+A field that drops the Gutenberg block editor into an Orchid Platform screen. Wraps [van-ons/laraberg](https://github.com/VanOns/laraberg) with an Orchid `Field`, a paste handler that strips Word/Docs cruft so pasting doesn't freeze the browser, and an opt-in bridge to a Laravel media-upload endpoint.
 
-# Table of Contents <!-- omit in toc -->
+> Requires PHP 8.1+, Orchid Platform ^14.15. License: MIT (this wrapper).
+> Laraberg itself is GPL-3.0-or-later — read its license before shipping commercial software.
+
+## Table of contents
+
 - [Installation](#installation)
-    - [JavaScript and CSS files](#javascript-and-css-files)
-    - [Dependencies](#dependencies)
-- [Updating](#updating)
-- [Usage](#usage)
-    - [Initializing the Editor](#initializing-the-editor)
-    - [Configuration options](#configuration-options)
-    - [Models](#models)
-    - [Custom Blocks](#custom-blocks)
-        - [Server-side blocks](#server-side-blocks)
-    - [WordPress exports](#wordpress-exports)
+- [Usage in an Orchid screen](#usage-in-an-orchid-screen)
+- [Options](#options)
+- [Media uploads](#media-uploads)
+- [Paste cleanup](#paste-cleanup)
+- [Custom blocks](#custom-blocks)
+- [Credits](#credits)
 
-# Installation
-
-Install package using composer:
+## Installation
 
 ```bash
 composer require protrafficgroup/orchid-laraberg
 ```
 
-Add vendor files to your project (CSS, JS & Config):
+The service provider auto-discovers and publishes Laraberg + wrapper assets on first boot. If something prevents auto-publishing (custom container, console-only runs), do it explicitly:
 
 ```bash
-php artisan vendor:publish --provider="VanOns\Laraberg\LarabergServiceProvider"
+php artisan vendor:publish --provider="VanOns\Laraberg\LarabergServiceProvider" --tag=public
 ```
 
-## JavaScript and CSS files
+To customise the default options array:
 
-The package provides a JS and CSS file that should be present on the page you want to use the editor on:
-
-```html
-<link rel="stylesheet" href="{{asset('vendor/laraberg/css/laraberg.css')}}">
-
-<script src="{{ asset('vendor/laraberg/js/laraberg.js') }}"></script>
-```
-
-## Dependencies
-
-The Gutenberg editor expects React, ReactDOM, Moment and JQuery to be in the environment it runs in. An easy way to do this would be to add the following lines to your page:
-
-```html
-<script src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
-
-<script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
-```
-
-# Updating
-
-When updating Laraberg you have to publish the vendor files again by running this command:
 ```bash
-php artisan vendor:publish --provider="VanOns\Laraberg\LarabergServiceProvider" --tag="public" --force
+php artisan vendor:publish --tag=laraberg-config
 ```
 
-# Usage
+## Usage in an Orchid screen
 
-## Initializing the Editor
+```php
+use Orchid\Support\Facades\Layout;
+use ProTrafficGroup\OrchidLaraberg\Laraberg;
 
-The Gutenberg editor should replace an existing textarea in a form. On submit the raw content from the editor will be put in the 'value' attribute of this textarea.
-
-```html
-<textarea id="[id_here]" name="[name_here]" hidden></textarea>
-```
-
-In order to edit content on an already existing model we have to set the value of the textarea to the raw content that the Gutenberg editor provided.
-
-```html
-<textarea id="[id_here]" name="[name_here]" hidden>{{ $model->content }}</textarea>
-```
-
-To initialize the editor all we have to do is call the initialize function with the id of the textarea. You probably want to do this insde a DOMContentLoaded event.
-
-And that's it! The editor will replace the textarea in the DOM and on a form submit the editor content will be available in the textarea's value attribute.
-
-```js
-Laraberg.init('[id_here]')
-```
-
-## Configuration options
-
-The `init()` function takes an optional configuration object which can be used to change Laraberg's behaviour in some ways.
-```js
-const options = {}
-Laraberg.init('[id_here]', options)
-```
-
-The `options` object should be a EditorSettings object.
-
-```typescript
-interface EditorSettings {
-    height?: string;
-    mediaUpload?: (upload: MediaUpload) => void;
-    fetchHandler?: FetchHandler;
-    disabledCoreBlocks?: string[];
-    alignWide?: boolean;
-    supportsLayout?: boolean;
-    maxWidth?: number;
-    imageEditing?: boolean;
-    colors?: Color[];
-    gradients?: Gradient[];
-    fontSizes?: FontSize[];
+public function layout(): iterable
+{
+    return [
+        Layout::rows([
+            Laraberg::make('content')->title('Body'),
+        ]),
+    ];
 }
 ```
 
-## Models
-
-In order to add the editor content to a model Laraberg provides the 'RendersContent' trait.
+The submit handler receives the raw Gutenberg HTML in `$request->input('content')` — store it directly. To render on the public site, use the `RendersContent` trait from the upstream Laraberg:
 
 ```php
+use Illuminate\Database\Eloquent\Model;
 use VanOns\Laraberg\Traits\RendersContent;
 
-class MyModel extends Model {
-  use RendersContent;
-}
-```
-
-This adds the `render` method to your model which takes care of rendering the raw editor content. By default the `render` methods renders the content in the `content` column, the column can be changed by changing the `$contentColumn` property on your model to the column that you want to use instead.
-
-```php
-use VanOns\Laraberg\Traits\RendersContent;
-
-class MyModel extends Model {
-  use RendersContent;
-
-  protected $contentColumn = 'my_column';
-}
-```
-
-Or by passing the column name to the render method.
-
-```php
-$model->render('my_column');
-```
-
-## Custom Blocks
-
-Gutenberg allows developers to create custom blocks. For information on how to create a custom block you should read the [Gutenberg documentation.](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type/)
-
-Registering custom blocks is fairly easy. A Gutenberg block requires the properties `title`, `icon`, and `categories`. It also needs to implement the functions `edit()` and `save()`.
-
-```js
-const myBlock =  {
-  title: 'My First Block!',
-  icon: 'universal-access-alt',
-  category: 'my-category',
-
-  edit() {
-    return <h1>Hello editor.</h1>
-  },
-
-  save() {
-    return <h1>Hello saved content.</h1>
-  }
+class Post extends Model
+{
+    use RendersContent;
 }
 
-Laraberg.registerBlockType('my-namespace/my-block', myBlock)
+// in a Blade view:
+// {!! $post->render() !!}
 ```
 
-### Server-side blocks
+By default the trait reads the `content` column. Override via `protected $contentColumn = 'body';` or pass the name into `$post->render('body')`.
 
-Server-side blocks can be registered in Laravel. You probably want to create a ServiceProvider and register your server-side blocks in it's `boot` method.
+## Options
+
+`Laraberg::make()->setOptions([...])` forwards options into `Laraberg.init` on the client. Anything supported by Laraberg's `EditorSettings` works — height, sizes, colours, gradients, disabled core blocks, and so on.
 
 ```php
-class BlockServiceProvider extends ServiceProvider {
-    public function boot() {
-        Laraberg::registerBlockType(
-          'my-namespace/my-block',
-          [],
-          function ($attributes, $content) {
-            return view('blocks.my-block', compact('attributes', 'content'));
-          }
-        );
+Laraberg::make('content')
+    ->setOptions([
+        'height'             => '600px',
+        'maxWidth'           => 800,
+        'disabledCoreBlocks' => ['core/code', 'core/freeform'],
+        'colors'             => [
+            ['name' => 'Brand red', 'slug' => 'brand-red', 'color' => '#c0392b'],
+        ],
+    ]);
+```
+
+Use `mergeOptions([...])` to add to an existing set without replacing it. The default option set lives in `config/orchid-laraberg.php` and is read on every `Laraberg::make()` call.
+
+## Media uploads
+
+Set the special `_mediaUploadEndpoint` option to a route URL — the field wires that URL into Gutenberg's `mediaUpload` callback, so Image / Gallery / Cover / Video blocks send selected files there.
+
+```php
+Laraberg::make('content')
+    ->setOptions([
+        '_mediaUploadEndpoint' => route('platform.laraberg.media'),
+    ]);
+```
+
+The frontend posts `multipart/form-data` with `files[]`, plus a CSRF header (`X-CSRF-TOKEN` from `<meta name="csrf-token">` if present, otherwise `X-XSRF-TOKEN` derived from the cookie — one of them will be accepted by Laravel's `VerifyCsrfToken` middleware).
+
+Your endpoint must return JSON in this shape:
+
+```json
+[
+    {
+        "id": 42,
+        "url": "https://example.test/storage/2026/05/17/abc.png",
+        "mime": "image/png",
+        "title": "logo.png",
+        "alt": "logo.png",
+        "caption": ""
+    }
+]
+```
+
+### Reference implementation
+
+Using Orchid's built-in `Attachment` (deduplicates by hash, ships with the platform):
+
+```php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Orchid\Attachment\File;
+
+class LarabergMediaController extends Controller
+{
+    public function __invoke(Request $request): JsonResponse
+    {
+        $request->validate([
+            'files'   => 'required|array|min:1',
+            'files.*' => 'file|max:20480',
+        ]);
+
+        $payload = [];
+
+        foreach ($request->file('files') as $uploaded) {
+            $attachment = (new File($uploaded))->load();
+
+            $payload[] = [
+                'id'      => $attachment->id,
+                'url'     => $attachment->url(),
+                'mime'    => $attachment->mime,
+                'title'   => $attachment->original_name,
+                'alt'     => $attachment->original_name,
+                'caption' => '',
+            ];
+        }
+
+        return response()->json($payload);
     }
 }
 ```
 
-## WordPress exports
+Route — register it **inside `routes/platform.php`** so the `platform` middleware adds auth + CSRF + the dashboard prefix:
 
-Laraberg uses the WordPress Gutenberg packages under the hood, a lot of those packages expose functionality that let's you customize the editor. You can find these packages in Javascript in the global `Laraberg` object.
+```php
+Route::post('/laraberg/media', LarabergMediaController::class)
+    ->name('platform.laraberg.media');
+```
+
+### Operational notes
+
+- Set `APP_URL` to the URL the editor is opened on (`http://example.test:81`). `Storage::disk('public')->url(...)` builds absolute URLs from it; if `APP_URL` is wrong, every uploaded image 404s.
+- `php artisan storage:link` must have been run; otherwise the `/storage/...` URL has no symlink to serve.
+- Default `nginx` `client_max_body_size` is `1m`. Raise it for larger uploads. PHP `upload_max_filesize` and `post_max_size` apply too — the real ceiling is the minimum of nginx / php / `files.*|max:` validator.
+
+## Paste cleanup
+
+When pasting from Word, Google Docs, or a browser page, Gutenberg's `pasteHandler` parses the HTML through a multi-pass DOMParser pipeline and matches it against every registered block. Rich HTML from word processors can trigger multi-second freezes.
+
+The field auto-registers a `blocks.pasteHandler` filter that strips, before Gutenberg sees the HTML:
+
+- Word-only attributes — `style`, `class`, `lang`, `mso-*`
+- Conditional comments — `<!--[if mso]>...<![endif]-->`
+- Namespaced tags — `<o:p>`, `<w:*>`, `<m:*>`, `<st1:*>`
+- Bare `<font>` / `<span>` wrappers
+
+For most Word / Docs paste flows this turns multi-second freezes into instant pastes. No configuration needed.
+
+Plain-text paste (`Ctrl+Shift+V` / `⌘+Shift+V`) bypasses the filter entirely and is always fast.
+
+## Custom blocks
+
+Anything that works against `van-ons/laraberg` v2.0.x works here unchanged — this wrapper does not touch block registration. See the upstream [custom block docs](https://github.com/VanOns/laraberg#custom-blocks).
+
+The bundled WordPress packages are exposed via the global `Laraberg` object:
 
 - `Laraberg.wordpress.blockEditor`
 - `Laraberg.wordpress.blocks`
@@ -191,3 +194,6 @@ Laraberg uses the WordPress Gutenberg packages under the hood, a lot of those pa
 - `Laraberg.wordpress.hooks`
 - `Laraberg.wordpress.serverSideRender`
 
+## Credits
+
+This package is a thin Orchid-flavored wrapper around [van-ons/laraberg](https://github.com/VanOns/laraberg) (GPL-3.0-or-later). All of the heavy lifting — bundling Gutenberg, rendering blocks, exposing WordPress packages — happens in that project.
