@@ -15,21 +15,21 @@ class Laraberg extends Field
         'options' => [],
     ];
 
-    public static function make(?string $name = null): Laraberg
+    public static function make(?string $name = null): static
     {
         return (new static())
             ->name($name)
             ->setOptions(config('laraberg.options', []));
     }
 
-    public function setOptions(array $options): Laraberg
+    public function setOptions(array $options): static
     {
         $this->attributes['options'] = $options;
 
         return $this;
     }
 
-    public function mergeOptions(array $options): Laraberg
+    public function mergeOptions(array $options): static
     {
         $this->attributes['options'] = array_merge($this->attributes['options'], $options);
 
